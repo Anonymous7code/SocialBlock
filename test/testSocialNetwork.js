@@ -29,13 +29,19 @@ contract('SocialNetwork',([deployer,author,tipper])=>{
         })
     })
 
-
+    
 
     describe('Posts',async()=>{
         let result,postCount
-        it('Creates Posts',async()=>{
-            result = await socialNetwork.createPost('This is the Beginning!!',{from:author})
+        before(async()=>{
+            
+            result = await socialNetwork.createPost('This is the first post',{from:author})
             postCount = await socialNetwork.postcount()
+        })
+        
+        it('Creates Posts',async()=>{
+            
+            //SUCCESS
             assert.equal(postCount,1)
             const event = result.logs[0].args
             assert.equal(event.id.toNumber(),postCount.toNumber(),'Id is Correct')
@@ -43,14 +49,19 @@ contract('SocialNetwork',([deployer,author,tipper])=>{
             assert.equal(event.tipAmount,'0','Id is Correct')
             assert.equal(event.author,author,'Author is Correct')
 
-
+            //Failure: Post must have content
             await socialNetwork.createPost('',{from:author}).should.be.rejected
         
         
         })
-        // it('Displays Post',async()=>{
+        it('lists Post',async()=>{
+            const posts = await socialNetwork.posts(postCount)
+            assert.equal(posts.id.toNumber(),postCount.toNumber(),'Id is Correct')
+            assert.equal(posts.content,'This is the first post','Content is Correct')
+            assert.equal(posts.tipAmount,'0','Id is Correct')
+            assert.equal(posts.author,author,'Author is Correct')
 
-        // }) 
+        }) 
         // it('Allows to tip the Posts',async()=>{
             
         // })
